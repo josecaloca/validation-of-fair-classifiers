@@ -19,19 +19,19 @@ Firstly, we will create a conda environment called *my_env*
 conda create -n my_env python=3.7.9
 ```
 
-Secondly, we will login to the *my_env* environment
+Secondly, we will activate the *my_env* environment that was recently created.
 
 ```
 conda activate my_env
 ```
 
-###  Download GitHub repo
+###  Clone this GitHub repo
 
 ```
 git clone https://github.com/josecaloca/validation-of-fair-classifiers.git
 ```
 
-###  Pip install libraries
+###  Pip install all required libraries
 
 ```
 pip install -r requirements.txt
