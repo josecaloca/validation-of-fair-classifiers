@@ -1,3 +1,9 @@
+"""
+Author: Jose Caloca
+Date: 21/04/2023
+
+"""
+
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -7,7 +13,14 @@ from sklearn.metrics import roc_curve, auc
 
 def plot_roc_curve(fpr, tpr, roc_auc):
     """
-    Plots the ROC curve and fills the area under the curve with a color based on the AUC.
+    Plot ROC curve and fill the area under the curve with a color based on the AUC.
+    Args:
+        fpr (array-like): False positive rate of ROC curve.
+        tpr (array-like): True positive rate of ROC curve.
+        roc_auc (float): AUC score of the ROC curve.
+
+    Returns:
+        None.
     """
     # Set the color of the fill area based on the AUC
     if roc_auc < 0.7:
@@ -37,15 +50,42 @@ def plot_roc_curve(fpr, tpr, roc_auc):
 
 
 def cdf(sample):
+    """Calculate the cumulative distribution function (CDF) of a sample.
+    Args:
+    sample (array-like): An array of numeric values.
+
+    Returns:
+        tuple: A tuple of two arrays (x, y), representing the x-axis and y-axis of the CDF. x contains the unique values in 
+        the sample sorted in ascending order, and y contains the cumulative probabilities corresponding to x.
+    """
     x, counts = np.unique(sample, return_counts=True)
     cusum = np.cumsum(counts)
     return x, cusum / cusum[-1]
 
 def add_decile(data, score_name):
+    """Add a decile rank column to a dataframe based on a specified score.
+    Args:
+    data (pandas.DataFrame): A pandas dataframe containing the data.
+    score_name (str): The name of the column containing the score to rank.
+
+    Returns:
+        pandas.Series: A pandas series containing the decile ranks for the specified score in the input dataframe.
+    """
     return pd.qcut(data[score_name], 10, labels=False)
 
 
 def agg_psi(sample, score_name, unique_key_name):
+    """
+    Aggregate data by decile rank and calculate the percentage of records in each decile.
+
+    Args:
+        sample (pandas.DataFrame): Input sample data.
+        score_name (str): Name of the score column in the sample.
+        unique_key_name (str): Name of the unique key column in the sample.
+
+    Returns:
+        pandas.DataFrame: Aggregated sample data with percentage of records in each decile.
+    """
     sample = sample.groupby(["Decile_rank"]).agg(
         {score_name: ["mean", "min", "max"], unique_key_name: "count"}
     )
@@ -56,7 +96,18 @@ def agg_psi(sample, score_name, unique_key_name):
 
 
 def PSI(sample1, sample2, score_name, unique_key_name):
+    """
+    Calculate the population stability index (PSI) between two samples.
 
+    Args:
+        sample1 (pandas.DataFrame): First sample for comparison.
+        sample2 (pandas.DataFrame): Second sample for comparison.
+        score_name (str): Name of the score column in the samples.
+        unique_key_name (str): Name of the unique key column in the samples.
+
+    Returns:
+        pandas.DataFrame: Dataframe with PSI and decile rank columns.
+    """
     samp1 = agg_psi(sample1, score_name, unique_key_name)
 
     samp2 = agg_psi(sample2, score_name, unique_key_name)
@@ -64,6 +115,7 @@ def PSI(sample1, sample2, score_name, unique_key_name):
     mix = samp1.merge(samp2, how="left", on="Decile_rank")
     mix["PSI"] = (mix["perc_x"] - mix["perc_y"]) * np.log(mix["perc_x"] / mix["perc_y"])
     return mix
+
 
 
 def score_percentile_comparison(
