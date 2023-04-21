@@ -1,6 +1,6 @@
-# SGH Warsaw School of Economics - Data Mining Class
+# SGH Warsaw School of Economics - Application of Business Intelligence in financial sector analyses
 
-This repository contains the materials for the SGH Warsaw School of Economics Data Mining class, focusing on Methods to Validate Fair Classifiers. 
+This repository contains the materials for the SGH Warsaw School of Economics Data Mining class, focusing on **Methods to Validate Fair Classifiers**. 
 
 The repository consists of four main Jupyter notebooks:
 
