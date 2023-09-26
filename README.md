@@ -1,6 +1,6 @@
 # SGH Warsaw School of Economics - Application of Business Intelligence in financial sector analyses
 
-This repository contains the materials for the lecture on **Methods to Validate Fair Classifiers** at SGH Warsaw School of Economics, for the course Application of Business Intelligence in financial sector analyses [234390-0090].
+This repository contains the materials for the lecture on **Methods to Validate Fair Classifiers** at SGH Warsaw School of Economics, for the course **Application of Business Intelligence in financial sector analyses** [234390-0090].
 
 The repository consists of four main Jupyter notebooks:
 
