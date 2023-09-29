@@ -16,7 +16,7 @@ To run the Jupyter notebooks, make sure to install the required libraries listed
 
 Firstly, we will create a conda environment called *my_env*
 ```
-conda create -n my_env python=3.7.9
+conda create -n my_env python=3.11.5
 ```
 
 Secondly, we will activate the *my_env* environment that was recently created.
