@@ -12,30 +12,33 @@ The repository consists of four main Jupyter notebooks:
 Additionally, the PowerPoint presentation used during the lecture is included in the repository.
 
 ## Requirements
-To run the Jupyter notebooks, make sure to install the required libraries listed in the requirements.txt file.
 
-Firstly, we will create a conda environment called *my_env*
-```
-conda create -n my_env python=3.11.5
-```
+Before getting started, you need to install the UV package manager.
+Follow the instructions here: [UV Installation Guide](https://docs.astral.sh/uv/getting-started/installation/).
+UV is a fast tool that helps you manage Python versions and install packages easily.
 
-Secondly, we will activate the *my_env* environment that was recently created.
 
-```
-conda activate my_env
-```
-
-###  Clone this GitHub repo
+###  Step 1: Download the project
+Open a terminal (or command prompt), then run:
 
 ```
 git clone https://github.com/josecaloca/validation-of-fair-classifiers.git
+cd validation-of-fair-classifiers
+```
+This will download the project to your computer and move you into its folder.
+
+###  Step 2: Set up Python 3.11.5 using `UV`
+Run this command to install and use Python version 3.11.5
+
+```
+uv python install 3.11.5
 ```
 
-###  Pip install all required libraries
+###  Step 3: Install all required packages
+Now, install the libraries the project needs by running:
 
 ```
-pip install -r requirements.txt
+uv sync
 ```
 
-## Usage
-To use the repository, clone or download the repository to your local machine. Then, navigate to the directory containing the notebooks and open them using Jupyter Notebook or JupyterLab.
+This will read the `pyproject.toml` file and install everything you need to run the notebooks.
