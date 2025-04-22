@@ -1,4 +1,5 @@
 # SGH Warsaw School of Economics - Application of Business Intelligence in financial sector analyses
+![CI](https://github.com/josecaloca/validation-of-fair-classifiers/actions/workflows/pytest.yml/badge.svg)
 
 This repository contains the materials for the lecture on **Methods to Validate Fair Classifiers** at SGH Warsaw School of Economics, for the course **Application of Business Intelligence in financial sector analyses** [234390-0090].
 
@@ -42,3 +43,5 @@ uv sync
 ```
 
 This will read the `pyproject.toml` file and install everything you need to run the notebooks.
+
+
