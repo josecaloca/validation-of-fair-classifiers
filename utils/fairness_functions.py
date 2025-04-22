@@ -4,6 +4,7 @@ Date: 21/04/2023
 
 """
 
+from typing import Optional, Dict, Tuple, Union
 import pandas as pd
 import numpy as np
 import matplotlib.pyplot as plt
@@ -14,16 +15,22 @@ import plotly.figure_factory as ff
 import plotly.graph_objs as go
 
 
-def plot_roc_curve(fpr, tpr, roc_auc):
+def plot_roc_curve(fpr: Union[list[float], np.ndarray],
+                   tpr: Union[list[float], np.ndarray],
+                   roc_auc: float) -> None:
     """
-    Plot ROC curve and fill the area under the curve.
+    Plot the Receiver Operating Characteristic (ROC) curve with the area under the curve filled in.
+
+    This function uses Plotly to visualize the performance of a binary classifier, 
+    plotting the true positive rate (TPR) against the false positive rate (FPR) for various thresholds.
+
     Args:
-        fpr (array-like): False positive rate of ROC curve.
-        tpr (array-like): True positive rate of ROC curve.
-        roc_auc (float): AUC score of the ROC curve.
+        fpr (list[float] or np.ndarray): False positive rates.
+        tpr (list[float] or np.ndarray): True positive rates.
+        roc_auc (float): Area Under the Curve (AUC) score.
 
     Returns:
-        None.
+        None
     """
     # Create a filled area under the ROC curve
     roc_trace = go.Scatter(x=fpr, y=tpr, mode='lines', name='ROC Curve (AUC = {:.2f})'.format(roc_auc), fill='tozeroy')
@@ -48,7 +55,22 @@ def plot_roc_curve(fpr, tpr, roc_auc):
     fig.show()
 
 
-def plot_pd_hist(df_credit, threshold_dict=None):
+def plot_pd_hist(df_credit: pd.DataFrame,
+                 threshold_dict: Optional[Dict[str, float]] = None) -> None:
+    """
+    Plot the probability of default (PD) distributions by sex using KDE plots.
+
+    This function visualizes the score distribution for male and female groups 
+    and optionally overlays vertical lines for specified thresholds.
+
+    Args:
+        df_credit (pd.DataFrame): DataFrame containing 'Sex' and 'Prob_default' columns.
+        threshold_dict (dict[str, float], optional): Dictionary of threshold labels and values 
+            to be shown as vertical dashed lines. Defaults to None.
+
+    Returns:
+        None
+    """
     # Create a KDE plot for male and female data
     fig = ff.create_distplot([df_credit[df_credit['Sex'] == 'male']['Prob_default']], 
                             group_labels=['Male'],
@@ -94,42 +116,52 @@ def plot_pd_hist(df_credit, threshold_dict=None):
     
     
         
-def cdf(sample):
-    """Calculate the cumulative distribution function (CDF) of a sample.
+def cdf(sample: Union[list[float], np.ndarray]) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Calculate the cumulative distribution function (CDF) for a given sample.
+
     Args:
-    sample (array-like): An array of numeric values.
+        sample (list[float] or np.ndarray): Input array of numeric values.
 
     Returns:
-        tuple: A tuple of two arrays (x, y), representing the x-axis and y-axis of the CDF. x contains the unique values in 
-        the sample sorted in ascending order, and y contains the cumulative probabilities corresponding to x.
+        Tuple[np.ndarray, np.ndarray]: 
+            - Sorted unique values (x-axis).
+            - Corresponding cumulative probabilities (y-axis).
     """
     x, counts = np.unique(sample, return_counts=True)
     cusum = np.cumsum(counts)
     return x, cusum / cusum[-1]
 
-def add_decile(data, score_name):
-    """Add a decile rank column to a dataframe based on a specified score.
+def add_decile(data: pd.DataFrame, score_name: str) -> pd.Series:
+    """
+    Assign decile ranks to a score column in a DataFrame.
+
+    Each observation is assigned a decile (0 to 9) based on its score value.
+
     Args:
-    data (pandas.DataFrame): A pandas dataframe containing the data.
-    score_name (str): The name of the column containing the score to rank.
+        data (pd.DataFrame): Input DataFrame containing the score column.
+        score_name (str): Name of the column containing scores to rank.
 
     Returns:
-        pandas.Series: A pandas series containing the decile ranks for the specified score in the input dataframe.
+        pd.Series: Series of decile ranks (integer values from 0 to 9).
     """
     return pd.qcut(data[score_name], 10, labels=False)
 
 
-def agg_psi(sample, score_name, unique_key_name):
+def agg_psi(sample: pd.DataFrame,
+            score_name: str,
+            unique_key_name: str) -> pd.DataFrame:
     """
-    Aggregate data by decile rank and calculate the percentage of records in each decile.
+    Aggregate a sample by decile rank and compute the proportion of records per decile.
 
     Args:
-        sample (pandas.DataFrame): Input sample data.
-        score_name (str): Name of the score column in the sample.
-        unique_key_name (str): Name of the unique key column in the sample.
+        sample (pd.DataFrame): Input data that must include a 'Decile_rank' column.
+        score_name (str): Column name for score to compute summary statistics.
+        unique_key_name (str): Column used to count the number of observations per decile.
 
     Returns:
-        pandas.DataFrame: Aggregated sample data with percentage of records in each decile.
+        pd.DataFrame: Aggregated DataFrame with mean, min, max of scores, 
+                      count of unique keys, and proportion of records (`perc`) per decile.
     """
     sample = sample.groupby(["Decile_rank"]).agg(
         {score_name: ["mean", "min", "max"], unique_key_name: "count"}
@@ -140,18 +172,24 @@ def agg_psi(sample, score_name, unique_key_name):
     return sample
 
 
-def PSI(sample1, sample2, score_name, unique_key_name):
+def PSI(sample1: pd.DataFrame,
+        sample2: pd.DataFrame,
+        score_name: str,
+        unique_key_name: str) -> pd.DataFrame:
     """
-    Calculate the population stability index (PSI) between two samples.
+    Compute the Population Stability Index (PSI) between two datasets.
+
+    PSI measures the shift in distribution of a score between two samples 
+    by comparing proportions across deciles.
 
     Args:
-        sample1 (pandas.DataFrame): First sample for comparison.
-        sample2 (pandas.DataFrame): Second sample for comparison.
-        score_name (str): Name of the score column in the samples.
-        unique_key_name (str): Name of the unique key column in the samples.
+        sample1 (pd.DataFrame): Baseline sample with 'Decile_rank' already assigned.
+        sample2 (pd.DataFrame): Comparison sample with same schema as sample1.
+        score_name (str): Column name of the score variable.
+        unique_key_name (str): Column used to compute counts for PSI calculation.
 
     Returns:
-        pandas.DataFrame: Dataframe with PSI and decile rank columns.
+        pd.DataFrame: DataFrame including decile-level proportions and PSI contribution.
     """
     samp1 = agg_psi(sample1, score_name, unique_key_name)
 
@@ -163,25 +201,31 @@ def PSI(sample1, sample2, score_name, unique_key_name):
 
 
 
-def score_percentile_comparison(
-    df, protected_variable, score, favoured_class=0, deprived_class=1, plot=True
-):
-    """The objective of this test is to graphically compare the distributions of the scores assigned by the model 
-    to the favoured and deprived sub-groups using a QQ-plot. Lastly, it fits a regression line of the QQ-plot to assess 
-    the difference in the distributions based on the 80% rule.
+def score_percentile_comparison(df: pd.DataFrame,
+                                protected_variable: str,
+                                score: str,
+                                favoured_class: int = 0,
+                                deprived_class: int = 1,
+                                plot: bool = True) -> Tuple[pd.DataFrame, pd.DataFrame]:
+    """
+    Graphically and statistically compare score distributions between protected subgroups.
+
+    This function creates a QQ-plot comparing score quantiles between a favoured and a deprived class, 
+    and performs a linear regression on the quantiles to quantify distributional differences 
+    based on fairness rules like the 80% rule.
 
     Args:
-        df (pandas.DataFrame):      Dataset containing the model score and sensitive variable
-        protected_variable (str):   String indicating the name of protected variable
-        score (str):                String indicating the name of the variable containing the scores
-        favoured_class (int):       Class of the favoured class in the protected variable
-        deprived_class (int):       Class of the deprived class in the protected variable
-        plot (bool):                Indicates whether to plot a QQ-plot. Default = True
+        df (pd.DataFrame): Dataset containing scores and the protected attribute.
+        protected_variable (str): Column name for the protected variable (e.g. gender, age group).
+        score (str): Column name for the model score.
+        favoured_class (int): Value in protected_variable denoting the advantaged group.
+        deprived_class (int): Value in protected_variable denoting the disadvantaged group.
+        plot (bool): Whether to display the QQ-plot. Defaults to True.
 
     Returns:
-        (pandas.DataFrame): Table summarising the percentiles and the difference
-
-        (pandas.DataFrame): Table summarising the results of the linear regression
+        Tuple[pd.DataFrame, pd.DataFrame]:
+            - DataFrame of quantiles for favoured and deprived groups, with their differences.
+            - DataFrame summarizing the linear regression fit (slope, intercept, p-value).
     """
     # Segment the scores of the favoured and deprived sub groups
     scores_deprived = df.loc[df[protected_variable] == deprived_class, score]
