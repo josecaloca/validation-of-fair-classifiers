@@ -26,6 +26,9 @@ jobs:
     - name: Run linting with ruff
       run: uv run ruff check
 
+    - name: Run formatting check with ruff
+      run: uv run ruff format --check .
+
     - name: Run unit tests
       run: uv run pytest tests
 
