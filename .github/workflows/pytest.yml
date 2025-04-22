@@ -23,5 +23,8 @@ jobs:
     - name: Install the project
       run: uv sync --locked --all-extras --dev
 
-    - name: Run tests
+    - name: Run unit tests
       run: uv run pytest tests
+
+    - name: Run coverage tests
+      run: uv run pytest --cov=utils tests/
