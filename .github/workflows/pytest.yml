@@ -24,8 +24,8 @@ jobs:
       run: uv sync --locked --all-extras --dev
 
     - name: Run linting with ruff
-      run: ruff check
-      
+      run: uv run ruff check
+
     - name: Run unit tests
       run: uv run pytest tests
 
