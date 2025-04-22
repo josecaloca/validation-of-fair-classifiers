@@ -257,7 +257,7 @@ def score_percentile_comparison(
     # calculate the difference in the scores
     df_pct["difference"] = df_pct["q_favoured"] - df_pct["q_deprived"]
     # Plot a QQ-plot. Default option is True
-    if plot == True:
+    if plot is True:
         plt.figure(figsize=(8, 8))
         plt.scatter(x="q_favoured", y="q_deprived", data=df_pct, label="Actual fit")
         sns.lineplot(
